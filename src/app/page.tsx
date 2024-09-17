@@ -56,11 +56,7 @@ export default function Home() {
 
   useEffect(() => {
     setFilteredProducts(prevProducts => sortProducts(prevProducts, sortOption));
-  }, [sortOption]);
-
-
-
-  
+  }, [productData, sortOption]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,20 +84,22 @@ export default function Home() {
     if (!showUser) {
       setShowUser(true);
       setShowProduct(false);
-      setSearch('');
+      
     } else {
       setShowUser(false);
     }
+    setSearch('');
   };
 
   const toggleShowProduct = () => {
     if (!showProduct) {
       setShowProduct(true);
       setShowUser(false);
-      setSearch('');
+      
     } else {
       setShowProduct(false);
     }
+    setSearch('');
   };
 
   const handleUserSearch = (search: string) => {
@@ -126,9 +124,7 @@ export default function Home() {
     
   };
 
-  
-
-  const sortProducts = (products: Product[], option: SortOption): Product[] => {
+  const sortProducts = (products: Product[], option: SortOption) => {
     switch (option) {
       case "alphabet":
         return [...products].sort((a, b) => a.title.localeCompare(b.title));
@@ -140,7 +136,6 @@ export default function Home() {
         return products;
     }
   };
-
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
