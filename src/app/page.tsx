@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import react from "react";
+import "./globals.css";
 
 interface User {
   userId: string;
@@ -13,6 +14,7 @@ interface Product {
   title: string;
   price: number;
   description: string;
+  rating: number;
 }
 
 type SortOption = "alphabet" | "priceLowtoHigh" | "priceHightoLow";
@@ -55,14 +57,20 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setFilteredProducts(prevProducts => sortProducts(prevProducts, sortOption));
+    setFilteredProducts((prevProducts) =>
+      sortProducts(prevProducts, sortOption)
+    );
+  }, [productData, sortOption]);
+
+  useEffect(() => {
+    setFilteredProducts(sortProducts(productData, sortOption));
   }, [productData, sortOption]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const correctUserCredential = userData.find(
-      (user) => user.userId == id && user.userPassword == password
+      (user) => user.userId === id && user.userPassword === password
     );
 
     if (correctUserCredential) {
@@ -84,22 +92,22 @@ export default function Home() {
     if (!showUser) {
       setShowUser(true);
       setShowProduct(false);
-      
     } else {
       setShowUser(false);
     }
-    setSearch('');
+    setSearch("");
+    setFilteredProducts(productData);
   };
 
   const toggleShowProduct = () => {
     if (!showProduct) {
       setShowProduct(true);
       setShowUser(false);
-      
     } else {
       setShowProduct(false);
     }
-    setSearch('');
+    setSearch("");
+    setFilteredUsers(userData);
   };
 
   const handleUserSearch = (search: string) => {
@@ -121,7 +129,6 @@ export default function Home() {
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOption(event.target.value as SortOption);
-    
   };
 
   const sortProducts = (products: Product[], option: SortOption) => {
@@ -138,94 +145,152 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      {isLoggedIn ? (
-        <div>
-          Welcome, {id}!
-          <button onClick={toggleShowUser}>
-            {showUser ? "Hide Users" : "Show Users"}
-          </button>
-          <button onClick={toggleShowProduct}>
-            {showProduct ? "Hide Products" : "Show Products"}
-          </button>
-          {showUser && (
-            <div>
-              <div className="search">
-                <input
-                  id="userSearch"
-                  placeholder="Search"
-                  onChange={(e) => handleUserSearch(e.target.value)}
-                />
-              </div>
+    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto overflow-y-auto">
+        {isLoggedIn ? (
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h1 className="text-2xl font-bold mb-6 text-gray-800">
+              Welcome, {id}!
+            </h1>
+            <div className="flex space-x-4 mb-6">
+              <button
+                onClick={toggleShowUser}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+              >
+                {showUser ? "Hide Users" : "Show Users"}
+              </button>
+              <button
+                onClick={toggleShowProduct}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+              >
+                {showProduct ? "Hide Products" : "Show Products"}
+              </button>
+            </div>
 
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <div key={user.userId}>User: {user.userId}</div>
-                ))
-              ) : (
-                <div>No users found...</div>
-              )}
-            </div>
-          )}
-          {showProduct && (
-            <div>
-              <div className="search">
+            {showUser && (
+              <div className="mb-8">
+                <div className="relative">
+                  <input
+                    id="userSearch"
+                    placeholder="Search Users"
+                    onChange={(e) => handleUserSearch(e.target.value)}
+                    className="w-full p-2 pl-10 border rounded-md text-black"
+                  />
+                </div>
+                <div className="mt-4 space-y-2">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <div key={user.userId} className="p-2 bg-gray-50 rounded text-black">
+                        User: {user.userId}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-500">No users found...</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {showProduct && (
+              <div className="mb-8">
+                <div className="flex space-x-4 mb-4">
+                  <div className="relative flex-grow text-black">
+                    <input
+                      id="productSearch"
+                      placeholder="Search Products"
+                      onChange={(e) => handleProductSearch(e.target.value)}
+                      className="w-full p-2 pl-10 border rounded-md"
+                    />
+                  </div>
+                  <div className="relative">
+                    <select
+                      name="sort"
+                      onChange={handleSortChange}
+                      value={sortOption}
+                      className="appearance-none bg-white border rounded-md py-2 pl-3 pr-10 text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="alphabet">Alphabetically</option>
+                      <option value="priceLowtoHigh">
+                        Price (Low to High)
+                      </option>
+                      <option value="priceHightoLow">
+                        Price (High to Low)
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        className="bg-white p-4 rounded-md shadow"
+                      >
+                        <h3 className="text-lg font-semibold text-black">
+                          {product.title}
+                        </h3>
+                        <p className="text-gray-600">Price: ${product.price}</p>
+                        <button
+                          onClick={() => toggleShowDescription(product.id)}
+                          className="mt-2 text-blue-500 hover:text-blue-700"
+                        >
+                          {visibleDescriptions[product.id]
+                            ? "Hide Description"
+                            : "Show Description"}
+                        </button>
+                        {visibleDescriptions[product.id] && (
+                          <p className="mt-2 text-gray-700">
+                            <div>{product.description}</div>
+                            <br></br>
+                            <div>Rating: {product.rating}</div>
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-500">No products found...</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white shadow-md rounded-lg p-8">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+              Please Sign In
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
                 <input
-                  id="productSearch"
-                  placeholder="Search"
-                  onChange={(e) => handleProductSearch(e.target.value)}
+                  type="text"
+                  onChange={(e) => setId(e.target.value)}
+                  value={id}
+                  placeholder="Enter your ID"
+                  className="w-full p-2 border rounded-md text-black"
                 />
               </div>
-              <div className="dropdown">
-                <select name="sort" onChange={handleSortChange} value={sortOption}>
-                  <option value="alphabet">Alphabetically</option>
-                  <option value="priceLowtoHigh">Price (Low to High)</option>
-                  <option value="priceHightoLow">Price (High to Low)</option>
-                </select>
+              <div>
+                <input
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  placeholder="Enter your Password"
+                  className="w-full p-2 border rounded-md text-black"
+                />
               </div>
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
-                  <div key={product.id}>
-                    Product: {product.title}
-                    <br></br>
-                    Price: {product.price}
-                    <button onClick={() => toggleShowDescription(product.id)}>
-                      {visibleDescriptions[product.id]
-                        ? "Hide Description"
-                        : "Show Description"}
-                    </button>
-                    {visibleDescriptions[product.id] && (
-                      <p>Description: {product.description}</p>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div>No products found...</div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+              >
+                Sign In
+              </button>
+              {errorMessage && (
+                <div className="text-red-500 text-center">{errorMessage}</div>
               )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div>
-          <div>Please Sign in!</div>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              onChange={(e) => setId(e.target.value)}
-              value={id}
-              placeholder="Enter your ID"
-            />
-            <input
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              placeholder="Enter your Password"
-            />
-            <button type="submit">Sign In</button>
-            <div>{errorMessage}</div>
-          </form>
-        </div>
-      )}
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
