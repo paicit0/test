@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import react from "react";
 import "./globals.css";
 
 interface User {
@@ -33,7 +32,6 @@ export default function Home() {
   const [showProduct, setShowProduct] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("alphabet");
 
   useEffect(() => {
@@ -95,7 +93,6 @@ export default function Home() {
     } else {
       setShowUser(false);
     }
-    setSearch("");
     setFilteredProducts(productData);
   };
 
@@ -106,12 +103,10 @@ export default function Home() {
     } else {
       setShowProduct(false);
     }
-    setSearch("");
     setFilteredUsers(userData);
   };
 
   const handleUserSearch = (search: string) => {
-    setSearch(search);
     setFilteredUsers(
       userData.filter((user) =>
         user.userId.toLowerCase().startsWith(search.toLowerCase())
@@ -120,7 +115,6 @@ export default function Home() {
   };
 
   const handleProductSearch = (search: string) => {
-    setSearch(search);
     const filtered = productData.filter((product) =>
       product.title.toLowerCase().startsWith(search.toLowerCase())
     );
