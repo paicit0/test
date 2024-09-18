@@ -18,4 +18,5 @@ How to run:
 
 Deployed on https://test-seven-blue-48.vercel.app/
 
-use username: test / password: test
+Use the following credential to login    
+username: test / password: test
